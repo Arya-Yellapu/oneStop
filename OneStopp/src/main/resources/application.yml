@@ -1,0 +1,42 @@
+server:
+  port: 9091                                         
+  ssl:
+   enabled: true
+   key-alias: alias                          
+   key-store: classpath:cert name
+   key-store-type: cert type                            
+   key-store-password: pass
+eureka:
+  instance:
+    hostname: localhost                  
+spring:
+  application:
+    name: onestop
+  datasource:
+   url: jdbc:postgresql://localhost:5432/postgres
+   username: 
+   password: 
+  mvc:
+    view:
+      prefix: /WEB-INF/jsp/
+      suffix: .jsp
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 
+            client-secret: 
+            scope: email,profile,https://www.googleapis.com/auth/calendar
+  mail:
+    host: smtp.gmail.com
+    password: 
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    username: 
+    

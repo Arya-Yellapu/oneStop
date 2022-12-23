@@ -1,0 +1,42 @@
+server:
+  port: 9091                                         
+  ssl:
+   enabled: true
+   key-alias: tomcat                          
+   key-store: classpath:keystore.jks 
+   key-store-type: JKS                            
+   key-store-password: Infosys
+eureka:
+  instance:
+    hostname: localhost                  
+spring:
+  application:
+    name: onestop
+  datasource:
+   url: jdbc:postgresql://localhost:5432/postgres
+   username: lenovo
+   password: Welcome90
+  mvc:
+    view:
+      prefix: /WEB-INF/jsp/
+      suffix: .jsp
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 57986820546-rt3qpem9vm6dq2d60uhjvgfsuvlsom18.apps.googleusercontent.com
+            client-secret: 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
+            scope: email,profile,https://www.googleapis.com/auth/calendar
+  mail:
+    host: smtp.gmail.com
+    password: mubgkcolivclycts
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    username: aryayellapu67@gmail.com
+    
