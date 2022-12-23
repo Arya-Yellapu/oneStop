@@ -1,0 +1,28 @@
+server:
+ ssl:
+    enabled: true
+    key-alias: tomcat
+    key-store: classpath:keystore.jks 
+    key-store-password: Infosys
+    key-store-type: JKS
+ port: 8080
+eureka:
+  instance:
+    hostname: localhost 
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      routes:
+        - id: onestop-eu
+          uri: https://localhost:9091
+          predicates:
+            - Path=/**
+        - id: onestop-es
+          uri: https://localhost:9092
+          predicates:
+            - Path=/**    
+      httpclient:
+        ssl:
+          useInsecureTrustManager: true      
