@@ -1,4 +1,4 @@
-package com.test.OneStop.Controller;
+	package com.test.OneStop.Controller;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -9,6 +9,7 @@ import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -45,6 +46,7 @@ import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.EventReminder;
+import com.test.OneStop.Dao.FinalSlots;
 import com.test.OneStop.Dao.LoginDaoImpl;
 import com.test.OneStop.Dao.LoginEntity;
 import com.test.OneStop.Dao.OTPEntity;
@@ -60,7 +62,7 @@ public class HomeContoller {
 	private static final String TOKENS_DIRECTORY_PATH = "tokens";
 	private static final List<String> SCOPES =
 		      Collections.singletonList(CalendarScopes.CALENDAR);
-		  private static final String CREDENTIALS_FILE_PATH = "Credentials.json file path";
+		  private static final String CREDENTIALS_FILE_PATH = "C:/Users/lenovo/Downloads/oneStopCredentials.json";
 		  private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT)
 			      throws IOException {
 			    // Load client secrets.
@@ -87,6 +89,9 @@ public class HomeContoller {
 	
 	@Value("${spring.mail.username}")
 	private String mailer;
+	
+	@Value("${server.port}")
+	private String port;
 	
 	@Autowired
 	JavaMailSender sender;
@@ -169,7 +174,7 @@ public class HomeContoller {
 		
 		ModelAndView m1 = new ModelAndView("register");
 		m1.addObject("MESSAGE", "Please Enter Valid Details");
-		if(firstName!=null && lastName!=null && mobileNumber!=null && mobileNumber.length()==10 && email!=null && password!=null)
+		if(!firstName.isBlank() && !lastName.isBlank() && !email.isBlank() && !mobileNumber.isBlank() && mobileNumber.length()==10 && !password.isBlank())
 		{
 			m1= new ModelAndView("otpScreen");
 			m1.addObject("message", "Please Enter the OTP Below");
@@ -301,6 +306,7 @@ public class HomeContoller {
     	ModelAndView m1 = new ModelAndView("index");
     	m1.addObject("currentUser", name);
     	m1.addObject("currentUserMail", currentUserMail);
+    	m1.addObject("port", port);
     	
 		return m1;
 	}
@@ -333,41 +339,54 @@ public class HomeContoller {
 	@Transactional
 	public ModelAndView getRestaurantSlots(@RequestParam(required=false) String currentResId,@RequestParam String currentUser,@RequestParam String currentUserMail,@RequestParam String location)
 	{
-		List<RestaurantEntity> ressList = daoImpl.getRestaurantsByLocation(location);
+		List<RestaurantEntity> ressList = new LinkedList<>();
 		
 		ModelAndView m1 = null;
 		String arr[] = currentResId.split(",");
 		if(arr.length>1)
 		{
+			
+			String[] userArr=currentUser.split(",");
+			String[] userMailArr=currentUserMail.split(",");
+			String[] locationArr=location.split(",");
+			
+			ressList = daoImpl.getRestaurantsByLocation(locationArr[0]);
+			
 			m1 = new ModelAndView("restaurantsByLocation");
-			m1.addObject("currentUser", currentUser);
-	    	m1.addObject("currentUserMail", currentUserMail);
+			m1.addObject("currentUser", userArr[0]);
+	    	m1.addObject("currentUserMail", userMailArr[0]);
 	    	m1.addObject("resList", ressList);
-	    	m1.addObject("location", location);
+	    	m1.addObject("location", locationArr[0]);
 	    	m1.addObject("message", "Please select only one restaurant");
 		}
 		else
 		{
 		List<Slots> resList = daoImpl.getRestaurantSlots(currentResId);
 		
-		if(resList.isEmpty())
-		{
-			m1 = new ModelAndView("restaurantsByLocation");
-			m1.addObject("currentUser", currentUser);
-	    	m1.addObject("currentUserMail", currentUserMail);
-	    	m1.addObject("resList", ressList);
-	    	m1.addObject("location", location);
-	    	m1.addObject("message", "Sorry there are no slots available at this moment for this restaurant, please try another restaurant");
-		}
-		else
-		{
+//		if(resList.isEmpty())
+//		{
+//			String[] userArr=currentUser.split(",");
+//			String[] userMailArr=currentUserMail.split(",");
+//			String[] locationArr=location.split(",");
+//			
+//			ressList = daoImpl.getRestaurantsByLocation(locationArr[0]);
+//			
+//			m1 = new ModelAndView("restaurantsByLocation");
+//			m1.addObject("currentUser", userArr[0]);
+//	    	m1.addObject("currentUserMail", userMailArr[0]);
+//	    	m1.addObject("resList", ressList);
+//	    	m1.addObject("location", locationArr[0]);
+//	    	m1.addObject("message", "Sorry there are no slots available at this moment for this restaurant, please try another restaurant");
+//		}
+//		else
+//		{
 			m1 = new ModelAndView("restaurantSlots");
 			m1.addObject("resList", resList);
 			m1.addObject("currentUser", currentUser);
 			m1.addObject("currentUserMail", currentUserMail);
 			m1.addObject("location", location);
 			m1.addObject("currentResId", currentResId);
-		}
+		//}
 		}
 		return m1;
 	}
@@ -395,6 +414,7 @@ public class HomeContoller {
 		}
 		else
 		{
+	    String[] sCurrent = currentUser.split(",");
 		String[] sArr = currentResId.split(",");
 		String[] sMailArr = currentUserMail.split(",");
 		String[] sLocationArr=location.split(",");
@@ -405,7 +425,8 @@ public class HomeContoller {
 
         String reservationId="oneStop"+counter++;
         
-        jdbc.execute("update slots set reservationid = '"+reservationId+"',status = 'Booked' where date_field = '"+date +"' and slot = '"+time+"'");
+        //jdbc.execute("update slots set reservationid = '"+reservationId+"',status = 'Booked' where date_field = '"+date +"' and slot = '"+time+"' and res_id = '"+Integer.valueOf(sArr[0])+"'");
+        daoImpl.updateSlot(reservationId, date, time, Integer.valueOf(sArr[0]), sMailArr[0]);
         
         String resName = jdbc.queryForObject("select restaurant_name from restaurants where id = "+Integer.valueOf(sArr[0]), String.class);
         SimpleMailMessage message = new SimpleMailMessage();
@@ -484,9 +505,54 @@ public class HomeContoller {
         
         m1=new ModelAndView("confirmation");
         m1.addObject("reservationid", reservationId);
+        m1.addObject("currentUser", sCurrent[0]);
+        m1.addObject("currentUserMail", sMailArr[0]);
+        m1.addObject("port", port);
         
 		}
 		return m1;
+	}
+	
+	@RequestMapping("/bookMore")
+	public ModelAndView bookMore(@RequestParam String currentUser, @RequestParam String currentUserMail)
+	{
+		return homePage();
+	}
+	
+	@RequestMapping("/getReservedSlots")
+	@Transactional
+	public ModelAndView getReservedSlots(@RequestParam String currentUser, @RequestParam String currentUserMail)
+	{
+		ModelAndView m1 = null;
+		List<FinalSlots> list =daoImpl.getSlots(currentUserMail);
+		if(!list.isEmpty())
+		{
+		m1 = new ModelAndView("bookedSlots");
+		m1.addObject("finalSlots", list);
+		m1.addObject("port", port);
+		m1.addObject("currentUser", currentUser);
+		m1.addObject("currentUserMail", currentUserMail);
+		}
+		else
+		{
+			m1=new ModelAndView("emptySlots");
+			m1.addObject("port", port);
+		}
+		return m1;
+	}
+	
+	@RequestMapping("/cancelSlot")
+	@Transactional
+	public ModelAndView cancelSlot(@RequestParam String currentUser, @RequestParam String currentUserMail, @RequestParam String reservationId, @RequestParam String slotId)
+	{
+		daoImpl.cancelSlot(reservationId, slotId);
+		SimpleMailMessage message = new SimpleMailMessage();
+		message.setTo(currentUserMail);
+		message.setSubject("Cancellation Of Reservation "+reservationId);
+		message.setText("Your Reservation "+reservationId+" has been cancelled");
+		message.setFrom(mailer);
+		sender.send(message);
+		return getReservedSlots(currentUser,currentUserMail);
 	}
 	
 }

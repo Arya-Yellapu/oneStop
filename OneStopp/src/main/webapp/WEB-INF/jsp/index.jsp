@@ -18,4 +18,5 @@ ${message}
 <input type="submit" name="submit" value="proceed">
 </form>
 <br>
+<a href="https://localhost:${port}/getReservedSlots?currentUser=${currentUser}&currentUserMail=${currentUserMail}">Get My Bookings</a>
 </body>

@@ -8,5 +8,13 @@
 </head>
 <body>
 Your reservation is ${reservationid}
+<br>
+<form action= "/bookMore" method = 'POST'>
+<input type="hidden" name = "currentUser" value = "${currentUser}">
+<input type="hidden" name = "currentUserMail" value = "${currentUserMail}">
+<input type="submit" name="submit" value="Book More Slots">
+</form>
+<br>
 <a href="/logout">Logout</a>
+<a href="https://localhost:${port}/getReservedSlots?currentUser=${currentUser}&currentUserMail=${currentUserMail}">Get My Bookings</a>
 </body>
