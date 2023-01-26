@@ -7,11 +7,8 @@
 <title>Insert title here</title>
 </head>
 <body>
-Welcome ${name}
-<form action="/addSlots" method='POST'>
-<input type="hidden" name="mail" value="${mail}">
-<input type="submit" name="submit" value="Add Restaurant Slots">
-</form>
-<a href="https://localhost:7071/viewRestaurants?mail=${mail}">Get My Restaurants</a>
+Sorry There are no Restaurants associated. To add Please click the link below.
+<br>
+<a href="https://localhost:7071">Add Restaurants</a>
 </body>
 </html>
